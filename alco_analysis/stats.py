@@ -13,8 +13,9 @@ def merge_df_on_city(df1,df2):
     return df_sum
 
 def different_correlations(df_sum):
-    korelacja = df_sum["Liczba_koncesji"].corr(df_sum["RAZEM Pożar (P)"])
-    print(f"Korelacja Pearsona między liczbą koncesji a łączną ilością pożarów: {korelacja:.3f}")
+    corr_pearson = df_sum["Liczba_koncesji"].corr(df_sum["RAZEM Pożar (P)"])
+    print(f"Korelacja Pearsona między liczbą koncesji a łączną ilością pożarów: {corr_pearson:.3f}")
+
 
 
 def summary(*args):
