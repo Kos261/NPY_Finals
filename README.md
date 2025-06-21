@@ -10,6 +10,10 @@
 * [Polish towns geographic location](https://astronomia.zagan.pl/art/wspolrzedne.html)
 
 
+* [SIMC](https://eteryt.stat.gov.pl/eTeryt/rejestr_teryt/udostepnianie_danych/baza_teryt/uzytkownicy_indywidualni/pobieranie/pliki_pelne.aspx?contrast=default)
+
+
+
 - Pylint
 - Cprofiler
 - pip package
