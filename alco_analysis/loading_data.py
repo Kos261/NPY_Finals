@@ -2,94 +2,6 @@ import pandas as pd
 import numpy as np
 import unidecode, re
 
-tag2woj = {
-    # Lubelskie
-    "zamojskie":        "LUBELSKIE",
-    "lubelskie":        "LUBELSKIE",
-    "bialskopodl.":     "LUBELSKIE",
-    "chełmskie":        "LUBELSKIE",
-
-    # Mazowieckie
-    "siedleckie":       "MAZOWIECKIE",
-    "radomskie":        "MAZOWIECKIE",
-    "ciechanowskie":    "MAZOWIECKIE",
-    "ostrołęckie":      "MAZOWIECKIE",
-    "płockie":          "MAZOWIECKIE",
-    "warszawskie":      "MAZOWIECKIE",
-    "warszaw.":         "MAZOWIECKIE",
-
-    # Wielkopolskie
-    "kaliskie":         "WIELKOPOLSKIE",
-    "konińskie":        "WIELKOPOLSKIE",
-    "leszczyńskie":     "WIELKOPOLSKIE",
-    "pilskie":          "WIELKOPOLSKIE",
-    "poznańskie":       "WIELKOPOLSKIE",
-
-    # Łódzkie
-    "skierniewickie":   "ŁÓDZKIE",
-    "skierniewic.":     "ŁÓDZKIE",
-    "sieradzkie":       "ŁÓDZKIE",
-    "piotrkowskie":     "ŁÓDZKIE",
-    "piotrkow.":        "ŁÓDZKIE",
-    "łódzkie":          "ŁÓDZKIE",
-
-    # Śląskie
-    "katowickie":       "ŚLĄSKIE",
-    "bielskie":         "ŚLĄSKIE",
-    "częstochowskie":   "ŚLĄSKIE",
-
-    # Małopolskie
-    "krakowskie":       "MAŁOPOLSKIE",
-    "nowosądeckie":     "MAŁOPOLSKIE",
-    "nowosąd.":         "MAŁOPOLSKIE",
-    "tarnowskie":       "MAŁOPOLSKIE",
-
-    # Podkarpackie
-    "rzeszow.":         "PODKARPACKIE",
-    "rzeszowskie":      "PODKARPACKIE",
-    "krośnieńskie":     "PODKARPACKIE",
-    "przemyskie":       "PODKARPACKIE",
-    "tarnobrzeskie":    "PODKARPACKIE",
-
-    # Podlaskie
-    "białostockie":     "PODLASKIE",
-    "łomżyńskie":       "PODLASKIE",
-    "suwalskie":        "PODLASKIE",
-
-    # Kujawsko-Pomorskie
-    "bydgoskie":        "KUJAWSKO-POMORSKIE",
-    "toruńskie":        "KUJAWSKO-POMORSKIE",
-    "włocławskie":      "KUJAWSKO-POMORSKIE",
-
-    # Pomorskie
-    "gdańskie":         "POMORSKIE",
-    "słupskie":         "POMORSKIE",
-
-    # Warmińsko-Mazurskie
-    "olsztyńskie":      "WARMIŃSKO-MAZURSKIE",
-
-    # Zachodniopomorskie
-    "szczecińskie":     "ZACHODNIOPOMORSKIE",
-
-    # Lubuskie
-    "gorzowskie":       "LUBUSKIE",
-    "zielonogór.":      "LUBUSKIE",
-    "zielonogórskie":   "LUBUSKIE",
-
-    # Dolnośląskie
-    "jeleniog.":        "DOLNOŚLĄSKIE",
-    "legnickie":        "DOLNOŚLĄSKIE",
-    "wałbrzyskie":      "DOLNOŚLĄSKIE",
-    "wrocławskie":      "DOLNOŚLĄSKIE",
-
-    # Świętokrzyskie
-    "kieleckie":        "ŚWIĘTOKRZYSKIE",
-
-    # Opolskie
-    "opolskie":         "OPOLSKIE"
-}
-
-
 
 
 def cut_KPPSP_in_city_names(df):
@@ -122,7 +34,7 @@ def split_cities(raw):
 
 def take_first_city(df):
     tmp = df.copy()
-    print(tmp.head(5))
+    # print(tmp.head(5))
     tmp['city'] = tmp['city'].apply(lambda x: split_cities(x)[0])
     return tmp
 
@@ -146,6 +58,7 @@ def load_cities(filepath_cities, debug=True):
                                 colspecs=[(0, 24), (25, 39), (40, 50)],
                                 names=["Miejscowość", "Długość", "Szerokość"],
                                 skiprows=1)
+    rows_before = df_cities.shape[0]
 
     df_cities.columns = df_cities.columns.str.strip()
     df_cities["Miejscowość"] = df_cities["Miejscowość"].str.strip()
@@ -170,14 +83,20 @@ def load_cities(filepath_cities, debug=True):
     df_cities['city'] = df_cities['city'].apply(norm_city)
     # df_cities['woj']  = df_cities['woj'].apply(norm_woj)
 
+    rows_after = df_cities.shape[0]
+    rows_deleted = rows_before - rows_after
     if debug:
         print("\n###CITIES DATAFRAME###\n")
-        print(df_cities.head(5))
+        # print(df_cities.head(5))
+    if rows_deleted > 0:
+        print(f"Deleted {rows_deleted} rows")
+        
 
     return df_cities
 
 def load_concession(filepath_conc, debug=True):
     df_conc = pd.read_csv(filepath_conc, usecols=['Miejscowość','Data ważności','Województwo'])
+    rows_before = df_conc.shape[0]
     df_conc = df_conc.dropna()
     
     df_conc["woj"]   = df_conc["Województwo"].str.replace(r"^WOJ\.\s*", "", regex=True).str.upper()
@@ -189,22 +108,34 @@ def load_concession(filepath_conc, debug=True):
     #Czasem koncesja jest do kilku miast naraz :( muszę wywalić te nadmiarowe
     df_conc = take_first_city(df_conc)
 
+    rows_after = df_conc.shape[0]
+    rows_deleted = rows_before - rows_after
     if debug:
         print("\n###CONCESSION DATAFRAME###\n")
-        print(df_conc.head(5))
+        # print(df_conc.head(5))
+    if rows_deleted > 0:
+        print(f"Deleted {rows_deleted} rows")
+        
     
     return df_conc
 
 def load_events(filepath_events, debug=True):
     df_events = pd.read_csv(filepath_events)
+    rows_before = df_events.shape[0]
     df_events = df_events.dropna()
     df_events = cut_KPPSP_in_city_names(df_events)
     df_events.rename(columns={"Miejscowość":"city"}, inplace=True)
     df_events['city'] = df_events['city'].apply(norm_city)
+
+    rows_after = df_events.shape[0]
+    rows_deleted = rows_before - rows_after
+
     if debug:
         print("\n###EVENTS DATAFRAME###\n")
-        print(df_events.head(5))
-        
+        # print(df_events.head(5))
+    if rows_deleted > 0:
+        print(f"Deleted {rows_deleted} rows")
+   
     return df_events
 
 def load_data(filepath_conc, filepath_events, filepath_cities):

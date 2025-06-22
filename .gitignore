@@ -80,7 +80,7 @@ target/
 .ipynb_checkpoints
 .gif
 
-tests
+# tests
 # data
 # IPython
 profile_default/
