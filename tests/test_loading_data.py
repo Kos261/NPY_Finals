@@ -5,7 +5,7 @@ import pathlib
 from pathlib import Path
 from tabulate import tabulate
 
-from alco_analysis.loading_data import (
+from alco_analysis.io import (
     load_concession,
     load_events,
     load_cities,

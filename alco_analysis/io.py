@@ -1,61 +1,10 @@
 import pandas as pd
-import numpy as np
-import unidecode, re
+from alco_analysis.features import *
 
-
-
-def cut_KPPSP_in_city_names(df):
-    #Aleksandrów Kujawski i Różno Parcele są razem nie wiedzieć czemu ale dobra
-    df["Miejscowość"] = df["Nazwa KP/M PSP"].apply(lambda x: " ".join(x.split()[2:]))
-    df = df.drop(["Nazwa KP/M PSP","Nazwa KW PSP"], axis=1)
-    return df
-
-def clean_city_names(txt):
-    """Zdejmuje polskie znaki, spacje, zamienia na lower-case
-       i odcina dopiski w nawiasie."""
-    txt = unidecode.unidecode(str(txt)).lower().strip()
-    # np. "Adamów (siedleckie)" -> "adamow"
-    return re.sub(r"\s*\(.*\)$", "", txt)
-
-def norm_city(txt):
-    return unidecode.unidecode(str(txt)).lower().strip()
-
-def norm_woj(txt):
-    return (str(txt)
-            .replace("WOJ.", "")
-            .replace("WOJ", "")
-            .strip()
-            .upper())
-
-def split_cities(raw):
-    # rozdziel po przecinku lub średniku
-    parts = re.split(r'[;,]', str(raw))
-    return [norm_city(p) for p in parts if p.strip()]
-
-def take_first_city(df):
-    tmp = df.copy()
-    # print(tmp.head(5))
-    tmp['city'] = tmp['city'].apply(lambda x: split_cities(x)[0])
-    return tmp
-
-def dms_to_decimal(coord):
-    import re
-    match = re.match(r"(\d+)°(\d+)'?([NSEW])", coord.strip())
-    if not match:
-        return None
-    degrees, minutes, direction = match.groups()
-    decimal = float(degrees) + float(minutes) / 60
-    if direction in ['W', 'S']:
-        decimal = -decimal
-    decimal = round(decimal,4)
-    return decimal
-
-
-
-def load_cities(filepath_cities, debug=True):
+def load_cities(filepath_cities, debug=False):
     df_cities = pd.read_fwf(filepath_cities, 
                                 header=None, 
-                                colspecs=[(0, 24), (25, 39), (40, 50)],
+                                colspecs=[(0, 23), (24, 38), (39, 50)],
                                 names=["Miejscowość", "Długość", "Szerokość"],
                                 skiprows=1)
     rows_before = df_cities.shape[0]
@@ -94,7 +43,7 @@ def load_cities(filepath_cities, debug=True):
 
     return df_cities
 
-def load_concession(filepath_conc, debug=True):
+def load_concession(filepath_conc, debug=False):
     df_conc = pd.read_csv(filepath_conc, usecols=['Miejscowość','Data ważności','Województwo'])
     rows_before = df_conc.shape[0]
     df_conc = df_conc.dropna()
@@ -119,7 +68,7 @@ def load_concession(filepath_conc, debug=True):
     
     return df_conc
 
-def load_events(filepath_events, debug=True):
+def load_events(filepath_events, debug=False):
     df_events = pd.read_csv(filepath_events)
     rows_before = df_events.shape[0]
     df_events = df_events.dropna()
@@ -138,10 +87,10 @@ def load_events(filepath_events, debug=True):
    
     return df_events
 
-def load_data(filepath_conc, filepath_events, filepath_cities):
-    df_conc = load_concession(filepath_conc)
-    df_events = load_events(filepath_events)
-    df_cities = load_cities(filepath_cities)
+def load_data(filepath_conc, filepath_events, filepath_cities, debug=False):
+    df_conc = load_concession(filepath_conc, debug)
+    df_events = load_events(filepath_events, debug)
+    df_cities = load_cities(filepath_cities, debug)
 
     return df_conc, df_events, df_cities # , df_conc_location     
 

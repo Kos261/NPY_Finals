@@ -1,8 +1,10 @@
 import argparse
-from alco_analysis.loading_data import load_data
-from alco_analysis.stats import count_concession, summary, merge_df_on_city, different_correlations
+from alco_analysis.io import load_data
+from alco_analysis.agg import merge_conc_cities, count_conc
+from alco_analysis.stats import summary, correlation
+from alco_analysis.heat_map import create_heatmap
 import cProfile
-# import re
+import re
 # cProfile.run('re.compile("foo|bar")')
 
 
@@ -21,21 +23,20 @@ if __name__ == "__main__":
                                                   args.file_fire,
                                                   args.file_cities)
 
-    # summary(df_conc, df_events)
-    conc_num = count_concession(df=df_conc)
+    merged = merge_conc_cities(df_conc, df_cities)
 
-    merged = df_conc.merge(df_cities, on=["city", "woj"], how="outer")
-    print("\n\t### MERGED ###\n")
-    print(merged.head(5))   
-
-    # df_sum = merge_df_on_city(conc_num, df_events)
-    # df_sum = merge_df_on_city(df_sum, df_cities)
-    # print(df_sum.head(5))
-    # print(df_sum.columns)
-
-
-    # different_correlations(df_sum)
-    # RUN $ python run_analysis.py -f1 data/concession.csv -f2 data/events.csv -f3 data/cities.csv
+    pearson = correlation(df_conc, df_cities, df_events)
+    # print("Pearson =", round(pearson, 3))
     
-    # PROFILE $ python -m cProfile -o temp.dat run_analysis.py -f1 data/concession.csv -f2 data/events.csv -f3 data/cities.csv
-    # SHOW PROFILE snakeviz temp.dat
+    create_heatmap(merged)
+    '''
+    RUN $ python run_analysis.py -f1 data/concession.csv -f2 data/events.csv -f3 data/cities.csv
+    
+    STREAMLIT $streamlit run run_analysis.py -- \
+    -f1 data/concession.csv \
+    -f2 data/events.csv     \
+    -f3 data/cities.csv
+    PROFILE $ python -m cProfile -o temp.dat run_analysis.py -f1 data/concession.csv -f2 data/events.csv -f3 data/cities.csv
+
+    SHOW PROFILE snakeviz temp.dat
+    '''

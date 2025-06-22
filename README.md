@@ -14,8 +14,6 @@
 
 
 
-- Pylint
 - Cprofiler
 - pip package
 - install as pull request
-- tests (crop data for tests)
