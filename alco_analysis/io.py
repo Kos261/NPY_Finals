@@ -7,6 +7,8 @@ def load_cities(filepath_cities, debug=False):
                                 colspecs=[(0, 23), (24, 38), (39, 50)],
                                 names=["Miejscowość", "Długość", "Szerokość"],
                                 skiprows=1)
+    df_cities.name = filepath_cities[:-4]
+
     rows_before = df_cities.shape[0]
 
     df_cities.columns = df_cities.columns.str.strip()
@@ -45,6 +47,7 @@ def load_cities(filepath_cities, debug=False):
 
 def load_concession(filepath_conc, debug=False):
     df_conc = pd.read_csv(filepath_conc, usecols=['Miejscowość','Data ważności','Województwo'])
+    df_conc.name = filepath_conc[:-4]
     rows_before = df_conc.shape[0]
     df_conc = df_conc.dropna()
     
@@ -70,6 +73,8 @@ def load_concession(filepath_conc, debug=False):
 
 def load_events(filepath_events, debug=False):
     df_events = pd.read_csv(filepath_events)
+    df_events.name = filepath_events[:-4]
+
     rows_before = df_events.shape[0]
     df_events = df_events.dropna()
     df_events = cut_KPPSP_in_city_names(df_events)
@@ -81,16 +86,32 @@ def load_events(filepath_events, debug=False):
 
     if debug:
         print("\n###EVENTS DATAFRAME###\n")
-        # print(df_events.head(5))
+        print(df_events.head(5))
     if rows_deleted > 0:
         print(f"Deleted {rows_deleted} rows")
    
     return df_events
 
-def load_data(filepath_conc, filepath_events, filepath_cities, debug=False):
+def load_population(filepath_pop, debug=False):
+    xls = pd.ExcelFile(filepath_pop)
+    df = xls.parse('województwa', skiprows=8, index_col=None, na_values=['NA'])
+
+    #Powinno być 16 województw
+    df_pop = df.iloc[:, :2].copy()
+    df_pop.columns = ["woj", "n_pop"]
+    df_pop["woj"] = df_pop["woj"].apply(norm_woj)
+    df_pop.name = filepath_pop[:-5]
+
+    if debug:
+        print("\n###POPULATION DATAFRAME###\n")
+        print(df_pop.head(5))
+    return df_pop
+
+def load_data(filepath_conc, filepath_events, filepath_cities, filepath_pop, debug=False):
     df_conc = load_concession(filepath_conc, debug)
     df_events = load_events(filepath_events, debug)
     df_cities = load_cities(filepath_cities, debug)
+    df_pop = load_population(filepath_pop, debug)
 
-    return df_conc, df_events, df_cities # , df_conc_location     
+    return df_conc, df_events, df_cities, df_pop 
 

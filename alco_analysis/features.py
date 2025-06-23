@@ -9,24 +9,21 @@ def cut_KPPSP_in_city_names(df):
     return df
 
 def clean_city_names(txt):
-    """Zdejmuje polskie znaki, spacje, zamienia na lower-case
-       i odcina dopiski w nawiasie."""
+    # No polish signs, white-sybmols, cuts additional "(names)"
     txt = unidecode.unidecode(str(txt)).lower().strip()
-    # np. "Adamów (siedleckie)" -> "adamow"
+    # ex. "Adamów (siedleckie)" -> "adamow"
     return re.sub(r"\s*\(.*\)$", "", txt)
 
 def norm_city(txt):
     return unidecode.unidecode(str(txt)).lower().strip()
 
 def norm_woj(txt):
-    return (str(txt)
-            .replace("WOJ.", "")
-            .replace("WOJ", "")
-            .strip()
-            .upper())
+    clean = (str(txt).replace("WOJ.", "").replace("WOJ", "").strip())
+    clean = unidecode.unidecode(str(clean)).lower().strip()
+    return clean
 
 def split_cities(raw):
-    # rozdziel po przecinku lub średniku
+    # divide after ','
     parts = re.split(r'[;,]', str(raw))
     return [norm_city(p) for p in parts if p.strip()]
 
