@@ -29,6 +29,7 @@ def tiny_files(tmp_path):
     conc_path = Path("data", "concession.csv")
     cities_path = Path("data", "cities.csv")
     events_path = Path("data", "events.csv")
+    pop_path = Path("data", "rezydenci_2023.xlsx")
     
     #Concessions
     df_conc = pd.read_csv(conc_path).head(10).copy()
@@ -51,6 +52,9 @@ def tiny_files(tmp_path):
     df_cities.loc[2, "Długość"] = "1000"
     temp_cities_path = Path(tmp_path, "cities.fwf")
     df_cities.to_fwf(temp_cities_path)
+
+    #Population
+    # :P
 
     paths = {"conc":   temp_conc_path,
              "events": temp_events_path,

@@ -26,7 +26,7 @@ if __name__ == "__main__":
     parser.add_argument('-o', "--output_folder", help="Provide path for statistical output file")
 
     args = parser.parse_args()
-    output_folder = args.output_folder
+    output_folder = Path(args.output_folder)
     output_folder.mkdir(parents=True, exist_ok=True)
 
     if args.file_conc and args.file_fire and args.file_cities and args.file_population:
@@ -81,11 +81,13 @@ if __name__ == "__main__":
     -f3 data/cities.csv
 
     PROFILE $ python -m cProfile    \
-        -o output/temp.dat run_analysis.py \
+        -o output/temp.dat          \
+        run_analysis.py             \
         -f1 data/concession.csv     \
         -f2 data/events.csv         \
         -f3 data/cities.csv         \
-        -o output
+        -f4 data/rezydenci_2023.xlsx\
+        -o output/
 
     SHOW PROFILE snakeviz output/temp.dat
     '''
