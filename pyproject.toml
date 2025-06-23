@@ -1,7 +1,7 @@
 [project]
 name = "alco-analysis"
 
-version = "0.2.0"
+version = "0.3.0"
 
 authors = [{name = "Konstanty Kłosiewicz", email = "xx@gmail.com"}]
 
@@ -35,6 +35,10 @@ build-backend = "setuptools.build_meta"
 [project.optional-dependencies]
 dev = ["pytest","snakeviz"]
 
+[tool.setuptools]
+package-dir = {"" = "src"} 
+
+
 [tool.setuptools.packages.find]
-where = ["."]
-include = ["alco_analysis*"]
+where    = ["src"]          
+include  = ["alco_analysis*"]

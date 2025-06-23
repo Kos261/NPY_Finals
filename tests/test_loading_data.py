@@ -26,23 +26,23 @@ pd.DataFrame.to_fwf = to_fwf
 
 @pytest.fixture
 def tiny_files(tmp_path):
-    conc_path = Path("data", "concession.csv")
-    cities_path = Path("data", "cities.csv")
-    events_path = Path("data", "events.csv")
-    pop_path = Path("data", "rezydenci_2023.xlsx")
+    conc_path = Path("tests","resources", "concession.csv")
+    cities_path = Path("tests","resources", "cities.csv")
+    events_path = Path("tests","resources", "events.csv")
+    pop_path = Path("tests","resources", "rezydenci_2023.xlsx")
     
     #Concessions
     df_conc = pd.read_csv(conc_path).head(10).copy()
     df_conc.loc[0, "Miejscowość"] = np.nan
     df_conc.loc[1, "Miejscowość"] += ", " + df_conc.loc[1, "Miejscowość"]
     temp_conc_path = Path(tmp_path,"conc.csv")
-    df_conc.to_csv(temp_conc_path, index=False)
+    df_conc.to_csv(temp_conc_path, index=False, encoding='utf-8')
 
     #Events
     df_events = pd.read_csv(events_path).head(10).copy()
     df_events.loc[0, "Nazwa KP/M PSP"] = "KP PSP Cokolwiek " + df_events.loc[0, "Nazwa KP/M PSP"]
     temp_events_path = Path(tmp_path , "events.csv")
-    df_events.to_csv(temp_events_path, index=False)
+    df_events.to_csv(temp_events_path, index=False, encoding='utf-8')
 
     #Cities
     cols = [(0, 24), (25, 39), (40, 50)]
@@ -54,11 +54,14 @@ def tiny_files(tmp_path):
     df_cities.to_fwf(temp_cities_path)
 
     #Population
-    # :P
+    temp_pop_path = Path(tmp_path , "rezydenci_2023.xlsx")
+    df_pop = pd.read_excel(pop_path,sheet_name="województwa")
+    df_pop.to_excel(temp_events_path, index=False)
 
     paths = {"conc":   temp_conc_path,
              "events": temp_events_path,
-             "cities": temp_cities_path,}
+             "cities": temp_cities_path,
+             "population": temp_pop_path}
     
     return paths
 
@@ -101,15 +104,18 @@ def test_load_cities_unique_city_key(tiny_files):
 
 
 def test_load_data_returns_three_df(tiny_files):
-    df_conc, df_events, df_cities = load_data(
+    df_conc, df_events, df_cities, df_pop = load_data(
         tiny_files["conc"],
         tiny_files["events"],
         tiny_files["cities"],
+        tiny_files["population"]
     )
     assert isinstance(df_conc,  pd.DataFrame)
     assert isinstance(df_events,  pd.DataFrame)
     assert isinstance(df_cities, pd.DataFrame)
+    assert isinstance(df_pop, pd.DataFrame)
     
     assert set(df_conc.columns)  >= {"city", "date", "woj"}
     assert "city" in df_events.columns
     assert set(df_cities.columns) >= {"city", "lon", "lat"}
+    assert set(df_pop.columns) >= {'woj', 'n_pop'}

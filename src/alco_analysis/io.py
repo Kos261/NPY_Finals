@@ -1,5 +1,9 @@
 import pandas as pd
 from alco_analysis.features import *
+import io
+from pathlib import Path
+from charset_normalizer import from_bytes
+
 
 def load_cities(filepath_cities, debug=False):
     df_cities = pd.read_fwf(filepath_cities, 
@@ -7,7 +11,7 @@ def load_cities(filepath_cities, debug=False):
                                 colspecs=[(0, 23), (24, 38), (39, 50)],
                                 names=["Miejscowość", "Długość", "Szerokość"],
                                 skiprows=1)
-    df_cities.name = filepath_cities[:-4]
+    # df_cities.name = filepath_cities[:-4]
 
     rows_before = df_cities.shape[0]
 
@@ -46,8 +50,9 @@ def load_cities(filepath_cities, debug=False):
     return df_cities
 
 def load_concession(filepath_conc, debug=False):
-    df_conc = pd.read_csv(filepath_conc, usecols=['Miejscowość','Data ważności','Województwo'])
-    df_conc.name = filepath_conc[:-4]
+    df_conc = pd.read_csv(filepath_conc)
+    # print(df_conc)
+    df_conc = df_conc[['Miejscowość','Data ważności','Województwo']]
     rows_before = df_conc.shape[0]
     df_conc = df_conc.dropna()
     
@@ -72,8 +77,11 @@ def load_concession(filepath_conc, debug=False):
     return df_conc
 
 def load_events(filepath_events, debug=False):
-    df_events = pd.read_csv(filepath_events)
-    df_events.name = filepath_events[:-4]
+    # enc = detect_encoding(filepath_events)
+    df_events = pd.read_csv(filepath_events)#,encoding="iso-8859-2")
+                                            #  ,encoding="latin")
+    # df_events = read_csv_clean(filepath_events,debug=True)
+   
 
     rows_before = df_events.shape[0]
     df_events = df_events.dropna()
@@ -100,7 +108,7 @@ def load_population(filepath_pop, debug=False):
     df_pop = df.iloc[:, :2].copy()
     df_pop.columns = ["woj", "n_pop"]
     df_pop["woj"] = df_pop["woj"].apply(norm_woj)
-    df_pop.name = filepath_pop[:-5]
+    # df_pop.name = filepath_pop[:-5]
 
     if debug:
         print("\n###POPULATION DATAFRAME###\n")
