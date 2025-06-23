@@ -3,7 +3,7 @@ Author: Konstanty Kłosiewicz
 
 The alco-analysis tool combines alcohol-concession data, State Fire Service incident records, population counts, and city coordinates to produce interactive density maps and risk counters that quantify the relationship between the number of concessions and fire risk.
 
-All code is packaged as a Python library ( src layout ) and can be installed in editable mode with ```$ pip install -e``` command while the production version is delivered to the repository via Pull Request.
+All code is packaged as a Python library ( src layout ) and can be installed in editable mode with ```$ pip install -e .``` command while the production version is delivered to the repository via Pull Request.
 
 The CLI accepts file paths as parameters, so no directories are hard-coded; the same core module also powers the companion notebook analysis_report.ipynb.
 
