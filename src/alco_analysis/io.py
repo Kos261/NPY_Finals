@@ -78,7 +78,8 @@ def load_concession(filepath_conc, debug=False):
 
 def load_events(filepath_events, debug=False):
     # enc = detect_encoding(filepath_events)
-    df_events = pd.read_csv(filepath_events, encoding="iso-8859-2")
+    df_events = pd.read_csv(filepath_events)#,encoding="iso-8859-2")
+                                            #  ,encoding="latin")
     # df_events = read_csv_clean(filepath_events,debug=True)
    
 
