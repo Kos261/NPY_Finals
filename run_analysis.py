@@ -39,29 +39,29 @@ if __name__ == "__main__":
     summary(output_folder, df_conc, df_events, df_pop)
 
 
-    # # Calculating correlation table
+    # Calculating correlation table
 
-    # df_corr = correlation_conc_events(df_conc, df_cities, df_events)
-    # df_corr
+    df_corr = correlation_conc_events(df_conc, df_cities, df_events)
+    df_corr
 
-    # corr_conc_pop = correlation_conc_pop(df_conc, df_pop)
+    corr_conc_pop = correlation_conc_pop(df_conc, df_pop)
     # print("Korelacja między populacją województwa ilością koncesji",corr_conc_pop)
 
-    # df_corr.loc[-1] = ["Populacja vs ilość koncesji", corr_conc_pop]
-    # df_corr.index = df_corr.index + 1  # shifting index
-    # df_corr = df_corr.sort_index() 
+    df_corr.loc[-1] = ["Populacja vs ilość koncesji", corr_conc_pop]
+    df_corr.index = df_corr.index + 1  # shifting index
+    df_corr = df_corr.sort_index() 
 
 
-    # corr_pop_ev = correlation_pop_events(df_conc, df_events, df_pop) 
+    corr_pop_ev = correlation_pop_events(df_conc, df_events, df_pop) 
     # print("Korelacja między populacją województwa a ilością pożarów",corr_conc_pop)
 
-    # df_corr.loc[-1] = ["Populacja vs liość pożarów (RAZEM)", corr_pop_ev]
-    # df_corr.index = df_corr.index + 1  # shifting index
-    # df_corr = df_corr.sort_index() 
+    df_corr.loc[-1] = ["Populacja vs liość pożarów (RAZEM)", corr_pop_ev]
+    df_corr.index = df_corr.index + 1  # shifting index
+    df_corr = df_corr.sort_index() 
 
 
 
-    # df_corr.to_csv(output_folder/"corr_notebook.csv")
+    df_corr.to_csv(output_folder/"corr_notebook.csv")
 
     create_heatmap(df_conc, df_events, df_cities, output_folder)
 
